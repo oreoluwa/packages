@@ -38,6 +38,7 @@ const init = (app, done) => {
   const linksProto = app.config.trackingProto || 'https';
   const linksHost = app.config.trackingHost;
   const linksPath = app.config.trackingPath;
+  const linksQuery = app.config.trackingQuery || 'link';
 
   app.addRewriteHook(
     (envelope, node) => ['text/html', 'text/plain'].includes(node.contentType),
@@ -53,10 +54,9 @@ const init = (app, done) => {
 
       let updatedMail = html;
       if (linksHost) {
-        const url = new URL(linksPath, linksHost);
-        url.protocol = linksProto;
+        const url = new URL(linksPath, `${linksProto}://${linksHost}`);
         updatedMail = html.replace(urlRegex({strict: false}), function(link) {
-          url.search = ['link', urlEncode(link) ].join('=');
+          url.search = [linksQuery, urlEncode(link) ].join('=');
 
           return url.href;
         });

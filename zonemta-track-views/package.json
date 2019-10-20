@@ -1,6 +1,6 @@
 {
-  "name": "@oreoluwa/zonemta-track-links",
-  "version": "1.0.0-1",
+  "name": "@oreoluwa/zonemta-track-views",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -17,8 +17,7 @@
   },
   "homepage": "https://github.com/oreoluwa/packages#readme",
   "dependencies": {
-    "iconv-lite": "^0.5.0",
-    "url-regex": "^5.0.0"
+    "iconv-lite": "^0.5.0"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
