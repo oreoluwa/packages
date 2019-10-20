@@ -1,7 +1,6 @@
 'use strict';
 
 const iconv = require('iconv-lite');
-const urlRegex = require('url-regex');
 const { URL } = require('url');
 
 const asyncifyStream = (decoder) => {
@@ -32,6 +31,29 @@ const urlDecode = (encoded) => {
   return Buffer.from(sanitizedEncoded, 'base64').toString('utf8');
 };
 
+// https://ctrlq.org/code/20294-regex-extract-links-javascript
+const updateLinksInHTML = (html, manipulate) => {
+  const regex = /href\s*=\s*(['"])(https?:\/\/.+?)\1/ig;
+  let link;
+
+  while((link = regex.exec(html)) !== null) {
+    html = html.replace(link[2], manipulate(link[2]));
+  }
+
+  return html;
+}
+
+const createTextLinks = (text) => (text || "").replace(
+    /([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
+    (match, space, url) => {
+      let hyperlink = url;
+      if (!hyperlink.match('^https?:\/\/')) {
+        hyperlink = 'http://' + hyperlink;
+      }
+      return space + '<a href="' + hyperlink + '">' + url + '</a>';
+    }
+  );
+
 const title = 'Track Mail Links Plugin';
 
 const init = (app, done) => {
@@ -55,8 +77,9 @@ const init = (app, done) => {
       let updatedMail = html;
       if (linksHost) {
         const url = new URL(linksPath, `${linksProto}://${linksHost}`);
-        updatedMail = html.replace(urlRegex({strict: false}), function(link) {
-          url.search = [linksQuery, urlEncode(link) ].join('=');
+        updatedMail = createTextLinks(html);
+        updatedMail = updateLinksInHTML(updatedMail, (text) => {
+          url.search = [linksQuery, urlEncode(text) ].join('=');
 
           return url.href;
         });
