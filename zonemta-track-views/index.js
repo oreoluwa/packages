@@ -1,7 +1,9 @@
 'use strict';
 
 const iconv = require('iconv-lite');
-const { URL } = require('url');
+const {
+  URL
+} = require('url');
 
 const asyncifyStream = (decoder) => {
   return new Promise((resolve, reject) => {
@@ -53,7 +55,7 @@ const init = (app, done) => {
       };
 
       encoder.end(Buffer.from(updatedMail));
-    };
+    }
   );
   done();
 };
