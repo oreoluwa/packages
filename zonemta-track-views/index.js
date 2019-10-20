@@ -44,8 +44,7 @@ const init = (app, done) => {
       if (linksHost && node.contentType === 'text/html') {
 
         const pixelUrl = new URL(linksPath, `${linksProto}://${linksHost}`);
-        const altText = "Tracking view";
-        let pixelLink = `<img src="${pixelUrl.href}" title="${altText}" />`;
+        let pixelLink = `<img src="${pixelUrl.href}" />`;
 
         if (/<\/body\b/i.test(updatedMail)) {
           updatedMail.replace(/<\/body\b/i, match => '\r\n' + pixelLink + '\r\n' + match);
