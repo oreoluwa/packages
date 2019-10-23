@@ -61,6 +61,7 @@ const init = (app, done) => {
   const linksHost = app.config.trackingHost;
   const linksPath = app.config.trackingPath;
   const linksQuery = app.config.trackingQuery || 'link';
+  const linksTemplate = app.config.trackingLinkTemplate;
 
   app.addRewriteHook(
     (envelope, node) => ['text/html', 'text/plain'].includes(node.contentType),
@@ -76,12 +77,28 @@ const init = (app, done) => {
 
       let updatedMail = html;
       if (linksHost) {
-        const url = new URL(linksPath, `${linksProto}://${linksHost}`);
+
         updatedMail = createTextLinks(html);
         updatedMail = updateLinksInHTML(updatedMail, (text) => {
-          url.search = [linksQuery, urlEncode(text) ].join('=');
+          const encodedLink= urlEncode(text);
 
-          return url.href;
+          let linksUrl;
+          if (linkTemplate) {
+            const replacements = {
+              envelopeId: envelope.id,
+              recipientId: ennvelope.to[0],
+              encodedLink,
+            };
+
+            Object.keys(replacements).forEach(key => {
+              linksUrl = linkTemplate.replace(`{${key}}`, replacements[key]);
+            });
+          } else {
+            url = new URL(linksPath, `${linksProto}://${linksHost}`);
+            url.search = [linksQuery, encodedLink ].join('=');
+            linksUrl = url.href;
+          };
+          return linksUrl;
         });
       }
 

@@ -27,6 +27,7 @@ const init = (app, done) => {
   const linksProto = app.config.pixelProto || 'https';
   const linksHost = app.config.pixelHost;
   const linksPath = app.config.pixelPath;
+  const linkTemplate = app.config.pixelUrlTemplate;
 
   app.addRewriteHook(
     (envelope, node) => ['text/html'].includes(node.contentType),
@@ -42,14 +43,27 @@ const init = (app, done) => {
 
       let updatedMail = html;
       if (linksHost && node.contentType === 'text/html') {
+        let pixelUrl;
 
-        const pixelUrl = new URL(linksPath, `${linksProto}://${linksHost}`);
-        let pixelLink = `<img class="link-tracking-open" alt="Open Tracking" width="0" height="0" style="border:0; width:0; height:0;" src="${pixelUrl}">`
+        if (linkTemplate) {
+          const replacements = {
+            envelopeId: envelope.id,
+            recipientId: ennvelope.to[0],
+          };
+
+          Object.keys(replacements).forEach(key => {
+            pixelUrl = linkTemplate.replace(`{${key}}`, replacements[key]);
+          });
+        } else {
+          pixelUrl = new URL(linksPath, `${linksProto}://${linksHost}`);
+        }
+
+        let pixelImage = `<img class="link-tracking-open" alt="Open Tracking" width="0" height="0" style="border:0; width:0; height:0;" src="${pixelUrl}">`
 
         if (/<\/body\b/i.test(updatedMail)) {
-          updatedMail.replace(/<\/body\b/i, match => '\r\n' + pixelLink + '\r\n' + match);
+          updatedMail.replace(/<\/body\b/i, match => '\r\n' + pixelImage + '\r\n' + match);
         } else {
-          updatedMail += '\r\n' + pixelLink;
+          updatedMail += '\r\n' + pixelImage;
         };
       };
 
