@@ -3,22 +3,7 @@
 const iconv = require('iconv-lite');
 const { URL } = require('url');
 const qs = require('querystring');
-
-const asyncifyStream = (decoder) => {
-  return new Promise((resolve, reject) => {
-    let chunks = [];
-    let chunklen = 0;
-    decoder.on('data', chunk => {
-      chunks.push(chunk);
-      chunklen += chunk.length;
-    });
-
-    decoder.on('end', () => {
-      const html = Buffer.concat(chunks, chunklen);
-      resolve(html);
-    });
-  });
-}
+const asyncifystream = require('@oreoluwa/asyncifystream');
 
 const urlEncode = (str) => {
   const encoded = Buffer.from(str).toString('base64')
@@ -44,17 +29,6 @@ const updateLinksInHTML = (html, manipulate) => {
   return html;
 }
 
-const createTextLinks = (text) => (text || "").replace(
-    /([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
-    (match, space, url) => {
-      let hyperlink = url;
-      if (!hyperlink.match('^https?:\/\/')) {
-        hyperlink = 'http://' + hyperlink;
-      }
-      return space + '<a href="' + hyperlink + '">' + url + '</a>';
-    }
-  );
-
 const title = 'Track Mail Links Plugin';
 
 const init = (app, done) => {
@@ -79,7 +53,6 @@ const init = (app, done) => {
       let updatedMail = html;
       if (linksHost || linkTemplate) {
 
-        updatedMail = createTextLinks(html);
         updatedMail = updateLinksInHTML(updatedMail, (text) => {
           const encodedLink= urlEncode(text);
 

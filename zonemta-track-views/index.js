@@ -5,22 +5,7 @@ const {
   URL
 } = require('url');
 const qs = require('querystring');
-
-const asyncifyStream = (decoder) => {
-  return new Promise((resolve, reject) => {
-    let chunks = [];
-    let chunklen = 0;
-    decoder.on('data', chunk => {
-      chunks.push(chunk);
-      chunklen += chunk.length;
-    });
-
-    decoder.on('end', () => {
-      const html = Buffer.concat(chunks, chunklen);
-      resolve(html);
-    });
-  });
-};
+const asyncifystream = require('@oreoluwa/asyncifystream');
 
 const urlEncode = (str) => {
   const encoded = Buffer.from(str).toString('base64')
