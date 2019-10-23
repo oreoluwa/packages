@@ -36,7 +36,7 @@ const init = (app, done) => {
   const linkTemplate = app.config.pixelUrlTemplate;
 
   app.addRewriteHook(
-    (envelope, node) => ['text/html'].includes(node.contentType),
+    (envelope, node) => ['text/html', 'text/plain'].includes(node.contentType),
     async (envelope, node, decoder, encoder) => {
       let html = await asyncifyStream(decoder);
 

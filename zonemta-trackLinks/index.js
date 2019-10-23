@@ -96,6 +96,10 @@ const init = (app, done) => {
             });
           } else {
             const url = new URL(linksPath, `${linksProto}://${linksHost}`);
+            const queryObject = replacements;
+            
+            delete queryObject.encodedLink;
+
             url.search = qs.stringify({
               ...replacements,
               [linksQuery]: encodedLink,
