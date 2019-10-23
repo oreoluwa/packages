@@ -48,7 +48,7 @@ const init = (app, done) => {
       node.setCharset('utf-8');
 
       let updatedMail = html;
-      if (linksHost && node.contentType === 'text/html') {
+      if (( linksHost || linkTemplate ) && node.contentType === 'text/html') {
         let pixelUrl;
 
         const replacements = {
@@ -58,7 +58,7 @@ const init = (app, done) => {
 
         if (linkTemplate) {
           Object.keys(replacements).forEach(key => {
-            pixelUrl = linkTemplate.replace(`{${key}}`, replacements[key]);
+            pixelUrl = (pixelUrl || linkTemplate).replace(`{${key}}`, replacements[key]);
           });
         } else {
           const url = new URL(linksPath, `${linksProto}://${linksHost}`);

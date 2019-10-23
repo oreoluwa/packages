@@ -77,7 +77,7 @@ const init = (app, done) => {
       node.setCharset('utf-8');
 
       let updatedMail = html;
-      if (linksHost) {
+      if (linksHost || linkTemplate) {
 
         updatedMail = createTextLinks(html);
         updatedMail = updateLinksInHTML(updatedMail, (text) => {
@@ -92,12 +92,12 @@ const init = (app, done) => {
           let linksUrl;
           if (linkTemplate) {
             Object.keys(replacements).forEach(key => {
-              linksUrl = linkTemplate.replace(`{${key}}`, replacements[key]);
+              linksUrl = (linksUrl || linkTemplate).replace(`{${key}}`, replacements[key]);
             });
           } else {
             const url = new URL(linksPath, `${linksProto}://${linksHost}`);
             const queryObject = replacements;
-            
+
             delete queryObject.encodedLink;
 
             url.search = qs.stringify({
