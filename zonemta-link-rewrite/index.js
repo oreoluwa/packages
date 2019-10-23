@@ -1,5 +1,5 @@
 const cheerio = require('cheerio');
-const asyncifystream = require('@oreoluwa/asyncifystream');
+const asyncifyStream = require('@oreoluwa/asyncifystream');
 
 // https://ctrlq.org/code/20294-regex-extract-links-javascript
 const createTextLinks = (text) => (text || "").replace(

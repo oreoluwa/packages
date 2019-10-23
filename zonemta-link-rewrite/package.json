@@ -1,6 +1,6 @@
 {
   "name": "@oreoluwa/zonemta-link-rewrite",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "Turn plain link to anchor tags and make anchor tags open on new tab",
   "main": "index.js",
   "scripts": {

@@ -3,7 +3,7 @@
 const iconv = require('iconv-lite');
 const { URL } = require('url');
 const qs = require('querystring');
-const asyncifystream = require('@oreoluwa/asyncifystream');
+const asyncifyStream = require('@oreoluwa/asyncifystream');
 
 const urlEncode = (str) => {
   const encoded = Buffer.from(str).toString('base64')
