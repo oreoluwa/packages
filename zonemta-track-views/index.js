@@ -22,6 +22,11 @@ const asyncifyStream = (decoder) => {
   });
 };
 
+const urlEncode = (str) => {
+  const encoded = Buffer.from(str).toString('base64')
+  return encoded.replace('+', '-').replace('/', '_').replace(/=+$/, '');
+};
+
 const title = 'Track Mail Views Plugin';
 
 const init = (app, done) => {
@@ -48,7 +53,7 @@ const init = (app, done) => {
 
         const replacements = {
           envelopeId: envelope.id,
-          recipientId: envelope.to[0],
+          recipientId: urlEncode(envelope.to[0]),
         };
 
         if (linkTemplate) {

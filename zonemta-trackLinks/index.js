@@ -85,7 +85,7 @@ const init = (app, done) => {
 
           const replacements = {
             envelopeId: envelope.id,
-            recipientId: envelope.to[0],
+            recipientId: urlEncode(envelope.to[0]),
             encodedLink,
           };
 
@@ -96,7 +96,10 @@ const init = (app, done) => {
             });
           } else {
             const url = new URL(linksPath, `${linksProto}://${linksHost}`);
-            url.search = qs.stringify(replacements);
+            url.search = qs.stringify({
+              ...replacements,
+              [linksQuery]: encodedLink,
+            });
             linksUrl = url.href;
           };
           return linksUrl;
