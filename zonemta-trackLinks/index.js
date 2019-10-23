@@ -2,6 +2,7 @@
 
 const iconv = require('iconv-lite');
 const { URL } = require('url');
+const qs = require('querystring');
 
 const asyncifyStream = (decoder) => {
   return new Promise((resolve, reject) => {
@@ -82,20 +83,20 @@ const init = (app, done) => {
         updatedMail = updateLinksInHTML(updatedMail, (text) => {
           const encodedLink= urlEncode(text);
 
+          const replacements = {
+            envelopeId: envelope.id,
+            recipientId: envelope.to[0],
+            encodedLink,
+          };
+
           let linksUrl;
           if (linkTemplate) {
-            const replacements = {
-              envelopeId: envelope.id,
-              recipientId: ennvelope.to[0],
-              encodedLink,
-            };
-
             Object.keys(replacements).forEach(key => {
               linksUrl = linkTemplate.replace(`{${key}}`, replacements[key]);
             });
           } else {
-            url = new URL(linksPath, `${linksProto}://${linksHost}`);
-            url.search = [linksQuery, encodedLink ].join('=');
+            const url = new URL(linksPath, `${linksProto}://${linksHost}`);
+            url.search = qs.stringify(replacements);
             linksUrl = url.href;
           };
           return linksUrl;

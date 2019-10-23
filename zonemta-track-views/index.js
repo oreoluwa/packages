@@ -4,6 +4,7 @@ const iconv = require('iconv-lite');
 const {
   URL
 } = require('url');
+const qs = require('querystring');
 
 const asyncifyStream = (decoder) => {
   return new Promise((resolve, reject) => {
@@ -45,17 +46,19 @@ const init = (app, done) => {
       if (linksHost && node.contentType === 'text/html') {
         let pixelUrl;
 
-        if (linkTemplate) {
-          const replacements = {
-            envelopeId: envelope.id,
-            recipientId: ennvelope.to[0],
-          };
+        const replacements = {
+          envelopeId: envelope.id,
+          recipientId: envelope.to[0],
+        };
 
+        if (linkTemplate) {
           Object.keys(replacements).forEach(key => {
             pixelUrl = linkTemplate.replace(`{${key}}`, replacements[key]);
           });
         } else {
-          pixelUrl = new URL(linksPath, `${linksProto}://${linksHost}`);
+          const url = new URL(linksPath, `${linksProto}://${linksHost}`);
+          url.search = qs.stringify(replacements);
+          pixelUrl = url.href;
         }
 
         let pixelImage = `<img class="link-tracking-open" alt="Open Tracking" width="0" height="0" style="border:0; width:0; height:0;" src="${pixelUrl}">`
