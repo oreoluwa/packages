@@ -61,7 +61,7 @@ const init = (app, done) => {
   const linksHost = app.config.trackingHost;
   const linksPath = app.config.trackingPath;
   const linksQuery = app.config.trackingQuery || 'link';
-  const linksTemplate = app.config.trackingLinkTemplate;
+  const linkTemplate = app.config.trackingLinkTemplate;
 
   app.addRewriteHook(
     (envelope, node) => ['text/html', 'text/plain'].includes(node.contentType),
