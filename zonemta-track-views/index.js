@@ -44,7 +44,7 @@ const init = (app, done) => {
       if (linksHost && node.contentType === 'text/html') {
 
         const pixelUrl = new URL(linksPath, `${linksProto}://${linksHost}`);
-        let pixelLink = `<img src="${pixelUrl.href}" />`;
+        let pixelLink = `<img class="link-tracking-open" alt="Open Tracking" width="0" height="0" style="border:0; width:0; height:0;" src="${pixelUrl}">`
 
         if (/<\/body\b/i.test(updatedMail)) {
           updatedMail.replace(/<\/body\b/i, match => '\r\n' + pixelLink + '\r\n' + match);
