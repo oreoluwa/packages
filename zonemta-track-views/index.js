@@ -1,11 +1,12 @@
 'use strict';
 
-const iconv = require('iconv-lite');
 const {
   URL
 } = require('url');
 const qs = require('querystring');
 const asyncifyStream = require('@oreoluwa/asyncifystream');
+const cheerio = require('cheerio');
+const PassThrough = require('stream').PassThrough;
 
 const urlEncode = (str) => {
   const encoded = Buffer.from(str).toString('base64')
@@ -21,46 +22,46 @@ const init = (app, done) => {
   const linkTemplate = app.config.pixelUrlTemplate;
 
   app.addRewriteHook(
-    (envelope, node) => ['text/html', 'text/plain'].includes(node.contentType),
+    (envelope, node) => ['text/html'].includes(node.contentType),
     async (envelope, node, decoder, encoder) => {
-      let html = await asyncifyStream(decoder);
+      const isHtml = node.contentType === 'text/html';
+      const isPlainText = node.contentType === 'text/plain';
 
-      if (node.charset) {
-        html = iconv.decode(html, node.charset);
-      } else {
-        html = html.toString('binary');
-      }
+      let html = await asyncifyStream(decoder, node.charset);
+      html = html.replace('ahref', 'a href');
+      const $ = cheerio.load(html);
+
       node.setCharset('utf-8');
 
-      let updatedMail = html;
-      if (( linksHost || linkTemplate ) && node.contentType === 'text/html') {
-        let pixelUrl;
+      if ( linksHost || linkTemplate ) {
+        if (isHtml) {
+          let pixelUrl;
 
-        const replacements = {
-          envelopeId: envelope.id,
-          recipientId: urlEncode(envelope.to[0]),
-        };
+          const replacements = {
+            envelopeId: envelope.id,
+            recipientId: urlEncode(envelope.to[0]),
+          };
 
-        if (linkTemplate) {
-          Object.keys(replacements).forEach(key => {
-            pixelUrl = (pixelUrl || linkTemplate).replace(`{${key}}`, replacements[key]);
-          });
-        } else {
-          const url = new URL(linksPath, `${linksProto}://${linksHost}`);
-          url.search = qs.stringify(replacements);
-          pixelUrl = url.href;
+          if (linkTemplate) {
+            Object.keys(replacements).forEach(key => {
+              pixelUrl = (pixelUrl || linkTemplate).replace(`{${key}}`, replacements[key]);
+            });
+          } else {
+            const url = new URL(linksPath, `${linksProto}://${linksHost}`);
+            url.search = qs.stringify(replacements);
+            pixelUrl = url.href;
+          }
+
+          let pixelImage = `<img class="link-tracking-open" alt="Open Tracking" width="0" height="0" style="border:0; width:0; height:0;" src="${pixelUrl}">`
+          $('body').prepend(pixelImage);
         }
-
-        let pixelImage = `<img class="link-tracking-open" alt="Open Tracking" width="0" height="0" style="border:0; width:0; height:0;" src="${pixelUrl}">`
-
-        if (/<\/body\b/i.test(updatedMail)) {
-          updatedMail.replace(/<\/body\b/i, match => '\r\n' + pixelImage + '\r\n' + match);
-        } else {
-          updatedMail += '\r\n' + pixelImage;
-        };
       };
 
-      encoder.end(Buffer.from(updatedMail));
+      const bufferStream = new PassThrough();
+      // Write to buffer
+      bufferStream.end(Buffer.from($.html(), node.charset || 'utf-8'));
+      // Pipe to encoder stream
+      bufferStream.pipe(encoder);
     }
   );
   done();

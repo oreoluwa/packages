@@ -1,6 +1,6 @@
 {
   "name": "@oreoluwa/asyncifystream",
-  "version": "1.0.0-1",
+  "version": "1.0.8",
   "description": "Asyncify a stream",
   "main": "index.js",
   "scripts": {
@@ -16,6 +16,9 @@
     "url": "https://github.com/oreoluwa/packages/issues"
   },
   "homepage": "https://github.com/oreoluwa/packages#readme",
+  "dependencies": {
+    "iconv-lite": "^0.5.0"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   }

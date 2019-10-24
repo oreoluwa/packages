@@ -1,9 +1,10 @@
 const cheerio = require('cheerio');
 const asyncifyStream = require('@oreoluwa/asyncifystream');
+const PassThrough = require('stream').PassThrough;
 
 // https://ctrlq.org/code/20294-regex-extract-links-javascript
 const createTextLinks = (text) => (text || "").replace(
-    /([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
+    /([^\S]|^)(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
     (match, space, url) => {
       let hyperlink = url;
       if (!hyperlink.match('^https?:\/\/')) {
@@ -19,15 +20,11 @@ const init = (app, done) => {
   const newTabLink = app.config.openLinkInNewTab;
 
   app.addRewriteHook(
-    (envelope, node) => ['text/html', 'text/plain'].includes(node.contentType),
+    (envelope, node) => ['text/html'].includes(node.contentType),
     async (envelope, node, decoder, encoder) => {
-      let html = await asyncifyStream(decoder);
 
-      if (node.charset) {
-        html = iconv.decode(html, node.charset);
-      } else {
-        html = html.toString('binary');
-      }
+      let html = await asyncifyStream(decoder, node.charset);
+
       node.setCharset('utf-8');
 
       let updatedMail = createTextLinks(html);
@@ -36,7 +33,11 @@ const init = (app, done) => {
 
       if (newTabLink) $('a').attr('target', '_blank');
 
-      encoder.end(Buffer.from($.html()));
+      const bufferStream = new PassThrough();
+      // Write to buffer
+      bufferStream.end(Buffer.from($.html(), node.charset || 'utf-8'));
+      // Pipe to encoder stream
+      bufferStream.pipe(encoder);
     }
   );
 

@@ -1,6 +1,6 @@
 {
   "name": "@oreoluwa/zonemta-link-rewrite",
-  "version": "1.0.5",
+  "version": "1.0.8",
   "description": "Turn plain link to anchor tags and make anchor tags open on new tab",
   "main": "index.js",
   "scripts": {
@@ -17,9 +17,8 @@
   },
   "homepage": "https://github.com/oreoluwa/packages#readme",
   "dependencies": {
-    "@oreoluwa/asyncifystream": "^1.0.0",
-    "cheerio": "^1.0.0-rc.3",
-    "iconv-lite": "^0.5.0"
+    "@oreoluwa/asyncifystream": "^1.0.8",
+    "cheerio": "^1.0.0-rc.3"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
