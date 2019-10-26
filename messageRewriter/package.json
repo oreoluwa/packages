@@ -1,0 +1,26 @@
+{
+  "name": "@oreoluwa/zone-mta-message-rewriter",
+  "version": "0.0.3",
+  "description": "Message Rewriting Plugin for ZoneMTA ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oreoluwa/packages.git"
+  },
+  "author": "Oreoluwa <oreoluwa@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oreoluwa/packages/issues"
+  },
+  "homepage": "https://github.com/oreoluwa/packages#readme",
+  "dependencies": {
+    "@oreoluwa/asyncifystream": "^1.0.8",
+    "cheerio": "^1.0.0-rc.3"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
+}
